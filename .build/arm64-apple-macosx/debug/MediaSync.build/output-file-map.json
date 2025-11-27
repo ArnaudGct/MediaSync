@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/master.swiftdeps"
+  },
+  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift": {
+    "dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.d",
+    "object": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.dia"
+  },
+  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift": {
+    "dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.d",
+    "object": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.dia"
+  },
+  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift": {
+    "dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.d",
+    "object": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.dia"
+  },
+  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift": {
+    "dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.d",
+    "object": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.dia"
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "builtTestProducts": [],
+  "copyCommands": {},
+  "explicitTargetDependencyImportCheckingMode": {
+    "none": {}
+  },
+  "generatedSourceTargetSet": [],
+  "pluginDescriptions": [],
+  "swiftCommands": {
+    "C.MediaSync-arm64-apple-macosx26.0-debug.module": {
+      "executable": "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/sources",
+      "importPath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/Modules",
+      "inputs": [
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/sources"
+        }
+      ],
+      "isLibrary": false,
+      "moduleName": "MediaSync",
+      "moduleOutputPath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/Modules/MediaSync.swiftmodule",
+      "objects": [
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.swift.o",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.swift.o",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.swift.o"
+      ],
+      "otherArguments": [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j16",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "MediaSync_main",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "MediaSync"
+      ],
+      "outputFileMapPath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/output-file-map.json",
+      "outputs": [
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/Modules/MediaSync.swiftmodule"
+        }
+      ],
+      "prepareForIndexing": false,
+      "sources": [
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift",
+        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift"
+      ],
+      "tempsPath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build",
+      "wholeModuleOptimization": false
+    }
+  },
+  "swiftFrontendCommands": {},
+  "swiftTargetScanArgs": {
+    "MediaSync": [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "MediaSync",
+      "-package-name",
+      "MediaSync",
+      "-c",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift",
+      "-I",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j16",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "MediaSync_main",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "MediaSync",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap": {
+    "MediaSync": []
+  },
+  "testDiscoveryCommands": {},
+  "testEntryPointCommands": {},
+  "traitConfiguration": {
+    "default": {}
+  },
+  "writeCommands": {
+    "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync-entitlement.plist": {
+      "alwaysOutOfDate": false,
+      "inputs": [
+        {
+          "kind": "virtual",
+          "name": "<entitlement-plist>"
+        },
+        {
+          "kind": "virtual",
+          "name": "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync-entitlement.plist"
+    },
+    "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/sources": {
+      "alwaysOutOfDate": false,
+      "inputs": [
+        {
+          "kind": "virtual",
+          "name": "<sources-file-list>"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift"
+        }
+      ],
+      "outputFilePath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/sources"
+    },
+    "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.product/Objects.LinkFileList": {
+      "alwaysOutOfDate": false,
+      "inputs": [
+        {
+          "kind": "virtual",
+          "name": "<link-file-list>"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/AudioCaptureManager.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/ContentView.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MdiaSyncMonitor.swift.o"
+        },
+        {
+          "kind": "file",
+          "name": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.build/MediaSyncApp.swift.o"
+        }
+      ],
+      "outputFilePath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/MediaSync.product/Objects.LinkFileList"
+    },
+    "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt": {
+      "alwaysOutOfDate": true,
+      "inputs": [
+        {
+          "kind": "virtual",
+          "name": "<swift-get-version>"
+        },
+        {
+          "kind": "file",
+          "name": "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath": "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}
