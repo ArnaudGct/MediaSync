@@ -188,6 +188,10 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << EOF
     <true/>
     <key>NSScreenCaptureUsageDescription</key>
     <string>Cette application nécessite l'accès à l'enregistrement d'écran pour détecter l'audio d'After Effects.</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2025 Arnaud Graciet. Vibe-codée avec ❤️</string>
+    <key>CFBundleGetInfoString</key>
+    <string>MediaSync ${VERSION} - Vibe-codée avec ❤️ par Arnaud Graciet - https://arnaudgct.fr/</string>
 </dict>
 </plist>
 EOF

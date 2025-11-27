@@ -485,6 +485,25 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color.cardBackground.opacity(0.6))
             )
+            
+            // Credits
+            HStack(spacing: 4) {
+                Text("Vibe-codée avec")
+                    .font(.system(size: 10))
+                    .foregroundColor(.textTertiary)
+                
+                Text("❤️")
+                    .font(.system(size: 10))
+                
+                Text("par")
+                    .font(.system(size: 10))
+                    .foregroundColor(.textTertiary)
+                
+                Link("Arnaud Graciet", destination: URL(string: "https://arnaudgct.fr/")!)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.accentGreen)
+            }
+            .padding(.top, 4)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 16)
