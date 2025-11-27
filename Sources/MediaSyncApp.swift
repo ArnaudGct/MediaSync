@@ -4,15 +4,23 @@ import SwiftUI
 struct MediaSyncApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var monitor = MdiaSyncMonitor()
+    @StateObject private var updateChecker = UpdateChecker()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(monitor)
+                .environmentObject(updateChecker)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultSize(width: 420, height: 600)
+        .commands {
+            // Ajouter un menu pour vérifier les mises à jour
+            CommandGroup(after: .appInfo) {
+                CheckForUpdatesButton(updateChecker: updateChecker)
+            }
+        }
     }
 }
 

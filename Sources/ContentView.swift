@@ -31,10 +31,12 @@ extension Color {
 // MARK: - Main Content View
 struct ContentView: View {
     @EnvironmentObject var monitor: MdiaSyncMonitor
+    @EnvironmentObject var updateChecker: UpdateChecker
     @AppStorage("resumeDelay") private var resumeDelay: Double = 1.0
     @AppStorage("autoStart") private var autoStart: Bool = true
     @State private var isHoveringButton = false
     @State private var selectedTab: Int = 0
+    @State private var showUpdateAlert = false
     
     var body: some View {
         ZStack {
@@ -43,6 +45,15 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // Header avec drag area
                 headerView
+                
+                // Bannière de mise à jour si disponible
+                if updateChecker.updateAvailable {
+                    UpdateBanner(updateChecker: updateChecker) {
+                        showUpdateAlert = true
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 12)
+                }
                 
                 // Tab Selector
                 tabSelector
@@ -57,6 +68,17 @@ struct ContentView: View {
                 // Footer with action button and settings
                 footerSection
             }
+            
+            // Update Alert Overlay
+            if showUpdateAlert {
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showUpdateAlert = false
+                    }
+                
+                UpdateAlertView(updateChecker: updateChecker, isPresented: $showUpdateAlert)
+            }
         }
         .frame(width: 420, height: 700)
         .onAppear {
@@ -64,6 +86,14 @@ struct ContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     monitor.start()
                 }
+            }
+            // Vérifier les mises à jour au démarrage
+            updateChecker.checkForUpdatesIfNeeded()
+        }
+        .onChange(of: updateChecker.updateAvailable) { _, newValue in
+            // Afficher automatiquement l'alerte si une mise à jour est trouvée
+            if newValue {
+                showUpdateAlert = true
             }
         }
     }

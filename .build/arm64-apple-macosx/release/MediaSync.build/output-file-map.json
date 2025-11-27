@@ -16,16 +16,22 @@
     "swift-dependencies": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swiftdeps",
     "diagnostics": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.dia"
   },
-  "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift": {
-    "object": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-    "swiftmodule": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor~partial.swiftmodule",
-    "swift-dependencies": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swiftdeps",
-    "diagnostics": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.dia"
-  },
   "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift": {
     "object": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
     "swiftmodule": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp~partial.swiftmodule",
     "swift-dependencies": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swiftdeps",
     "diagnostics": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.dia"
+  },
+  "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncMonitor.swift": {
+    "object": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.dia"
+  },
+  "/Users/arnaudgct/Desktop/MediaSync/Sources/UpdateChecker.swift": {
+    "object": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.swift.o",
+    "swiftmodule": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker~partial.swiftmodule",
+    "swift-dependencies": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.swiftdeps",
+    "diagnostics": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.dia"
   }
 }

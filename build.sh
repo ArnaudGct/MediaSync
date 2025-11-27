@@ -12,6 +12,20 @@ BUNDLE_ID="com.mediasync.app"
 BUILD_DIR="$(pwd)/.build/release"
 APP_BUNDLE="$(pwd)/dist/${APP_NAME}.app"
 
+# ⚠️ VERSION - Modifiez ces valeurs lors d'une mise à jour
+VERSION="2.1.0"
+VERSION_SHORT="2.1"
+
+echo ""
+echo "═══════════════════════════════════════════════════════════════════════════"
+echo "  🔨 Building ${APP_NAME} v${VERSION}"
+echo "═══════════════════════════════════════════════════════════════════════════"
+echo ""
+
+# Mettre à jour la version dans UpdateChecker.swift
+echo "📝 Mise à jour de la version dans le code..."
+sed -i '' "s/static let currentVersion = \".*\"/static let currentVersion = \"${VERSION}\"/" Sources/UpdateChecker.swift
+
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo "  🔨 Building ${APP_NAME}"
@@ -149,9 +163,9 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << EOF
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleVersion</key>
-    <string>2.1.0</string>
+    <string>${VERSION}</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1</string>
+    <string>${VERSION_SHORT}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
@@ -183,12 +197,37 @@ echo ""
 echo "🔐 Signature de l'application..."
 codesign --force --deep --sign - "${APP_BUNDLE}"
 
+# Créer un DMG pour la distribution
+echo ""
+echo "📀 Création du DMG..."
+DMG_NAME="${APP_NAME}-$(cat "${APP_BUNDLE}/Contents/Info.plist" | grep -A1 CFBundleShortVersionString | tail -1 | sed 's/.*<string>\(.*\)<\/string>.*/\1/').dmg"
+
+# Créer un dossier temporaire pour le DMG
+DMG_TEMP="dist/dmg_temp"
+rm -rf "${DMG_TEMP}"
+mkdir -p "${DMG_TEMP}"
+
+# Copier l'app
+cp -r "${APP_BUNDLE}" "${DMG_TEMP}/"
+
+# Créer un lien symbolique vers Applications
+ln -s /Applications "${DMG_TEMP}/Applications"
+
+# Créer le DMG
+hdiutil create -volname "${APP_NAME}" -srcfolder "${DMG_TEMP}" -ov -format UDZO "dist/${DMG_NAME}"
+
+# Nettoyer
+rm -rf "${DMG_TEMP}"
+
+echo "✓ DMG créé: dist/${DMG_NAME}"
+
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo "  ✅ Build terminé avec succès!"
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo ""
 echo "  📍 Application: dist/${APP_NAME}.app"
+echo "  📀 DMG:         dist/${DMG_NAME}"
 echo ""
 echo "  💡 Pour installer dans Applications:"
 echo "     cp -r \"dist/${APP_NAME}.app\" /Applications/"

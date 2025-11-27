@@ -1,52 +1,67 @@
 {
-  "builtTestProducts": [],
-  "copyCommands": {},
-  "explicitTargetDependencyImportCheckingMode": {
-    "none": {}
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
   },
-  "generatedSourceTargetSet": [],
-  "pluginDescriptions": [],
-  "swiftCommands": {
-    "C.MediaSync-arm64-apple-macosx26.0-release.module": {
-      "executable": "/Library/Developer/CommandLineTools/usr/bin/swiftc",
-      "fileList": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
-      "importPath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules",
-      "inputs": [
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.MediaSync-arm64-apple-macosx26.0-release.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
+      "importPath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules",
+      "inputs" : [
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncMonitor.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/UpdateChecker.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
         }
       ],
-      "isLibrary": false,
-      "moduleName": "MediaSync",
-      "moduleOutputPath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
-      "objects": [
+      "isLibrary" : false,
+      "moduleName" : "MediaSync",
+      "moduleOutputPath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
+      "objects" : [
         "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
         "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
-        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o"
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.swift.o"
       ],
-      "otherArguments": [
+      "otherArguments" : [
         "-target",
         "arm64-apple-macosx14.0",
         "-whole-module-optimization",
@@ -85,55 +100,63 @@
         "-Xcc",
         "-g",
         "-package-name",
-        "MediaSync"
+        "mediasync"
       ],
-      "outputFileMapPath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/output-file-map.json",
-      "outputs": [
+      "outputFileMapPath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/output-file-map.json",
+      "outputs" : [
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule"
         }
       ],
-      "prepareForIndexing": false,
-      "sources": [
+      "prepareForIndexing" : false,
+      "sources" : [
         "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift",
         "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift",
-        "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift",
-        "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift"
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncMonitor.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/UpdateChecker.swift"
       ],
-      "tempsPath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build",
-      "wholeModuleOptimization": true
+      "tempsPath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build",
+      "wholeModuleOptimization" : true
     }
   },
-  "swiftFrontendCommands": {},
-  "swiftTargetScanArgs": {
-    "MediaSync": [
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "MediaSync" : [
       "/Library/Developer/CommandLineTools/usr/bin/swiftc",
       "-module-name",
       "MediaSync",
       "-package-name",
-      "MediaSync",
+      "mediasync",
       "-c",
       "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift",
       "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift",
-      "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift",
       "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift",
+      "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncMonitor.swift",
+      "/Users/arnaudgct/Desktop/MediaSync/Sources/UpdateChecker.swift",
       "-I",
       "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules",
       "-target",
@@ -174,85 +197,101 @@
       "-Xcc",
       "-g",
       "-package-name",
-      "MediaSync",
+      "mediasync",
       "-driver-use-frontend-path",
       "/Library/Developer/CommandLineTools/usr/bin/swiftc"
     ]
   },
-  "targetDependencyMap": {
-    "MediaSync": []
+  "targetDependencyMap" : {
+    "MediaSync" : [
+
+    ]
   },
-  "testDiscoveryCommands": {},
-  "testEntryPointCommands": {},
-  "traitConfiguration": {
-    "default": {}
+  "testDiscoveryCommands" : {
+
   },
-  "writeCommands": {
-    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources": {
-      "alwaysOutOfDate": false,
-      "inputs": [
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
         {
-          "kind": "virtual",
-          "name": "<sources-file-list>"
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncMonitor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/Sources/UpdateChecker.swift"
         }
       ],
-      "outputFilePath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
+      "outputFilePath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
     },
-    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList": {
-      "alwaysOutOfDate": false,
-      "inputs": [
+    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
         {
-          "kind": "virtual",
-          "name": "<link-file-list>"
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o"
         },
         {
-          "kind": "file",
-          "name": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o"
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncMonitor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/UpdateChecker.swift.o"
         }
       ],
-      "outputFilePath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList"
+      "outputFilePath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList"
     },
-    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt": {
-      "alwaysOutOfDate": true,
-      "inputs": [
+    "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
         {
-          "kind": "virtual",
-          "name": "<swift-get-version>"
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
         },
         {
-          "kind": "file",
-          "name": "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
         }
       ],
-      "outputFilePath": "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
+      "outputFilePath" : "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
     }
   }
 }
