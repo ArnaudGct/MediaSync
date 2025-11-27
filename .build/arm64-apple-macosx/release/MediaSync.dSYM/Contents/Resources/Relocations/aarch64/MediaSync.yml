@@ -1,6 +1,6 @@
 ---
 triple: "arm64-apple-darwin"
-binary-path: "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync"
+binary-path: "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync"
 relocations:
   - {
       offset: 0x1546B1,

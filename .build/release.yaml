@@ -20,43 +20,43 @@ targets:
     ]
 default: "main"
 nodes:
-  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/":
+  "/Users/arnaudgct/Desktop/MediaSync/Sources/":
     is-directory-structure: true
     content-exclusion-patterns: [".git", ".build"]
 commands:
-  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources":
+  "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources":
     tool: write-auxiliary-file
     inputs:
       [
         "<sources-file-list>",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift",
       ]
     outputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
       ]
-    description: "Write auxiliary file /Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
+    description: "Write auxiliary file /Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources"
 
-  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList":
+  "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList":
     tool: write-auxiliary-file
     inputs:
       [
         "<link-file-list>",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
       ]
     outputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
       ]
-    description: "Write auxiliary file /Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList"
+    description: "Write auxiliary file /Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList"
 
-  "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt":
+  "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt":
     tool: write-auxiliary-file
     inputs:
       [
@@ -65,16 +65,16 @@ commands:
       ]
     outputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt",
       ]
     always-out-of-date: "true"
-    description: "Write auxiliary file /Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
+    description: "Write auxiliary file /Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt"
 
   "<MediaSync-arm64-apple-macosx26.0-release.exe>":
     tool: phony
     inputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
       ]
     outputs: ["<MediaSync-arm64-apple-macosx26.0-release.exe>"]
 
@@ -82,11 +82,11 @@ commands:
     tool: phony
     inputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
       ]
     outputs: ["<MediaSync-arm64-apple-macosx26.0-release.module>"]
 
@@ -94,24 +94,24 @@ commands:
     tool: shell
     inputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
       ]
     outputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
       ]
     description: "Linking ./.build/arm64-apple-macosx/release/MediaSync"
     args:
       [
         "/Library/Developer/CommandLineTools/usr/bin/swiftc",
         "-L",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release",
         "-o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync",
         "-module-name",
         "MediaSync",
         "-Xlinker",
@@ -129,7 +129,7 @@ commands:
         "-rpath",
         "-Xlinker",
         "@loader_path",
-        "@/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
+        "@/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.product/Objects.LinkFileList",
         "-Xlinker",
         "-rpath",
         "-Xlinker",
@@ -151,20 +151,20 @@ commands:
     tool: shell
     inputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/AudioCaptureManager.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/ContentView.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MdiaSyncMonitor.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/MediaSyncApp.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/AudioCaptureManager.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/ContentView.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MdiaSyncMonitor.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/MediaSyncApp.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/swift-version--1AB21518FC5DEDBE.txt",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
       ]
     outputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/AudioCaptureManager.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/ContentView.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MdiaSyncMonitor.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/MediaSyncApp.swift.o",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
       ]
     description: "Compiling Swift Module 'MediaSync' (4 sources)"
     args:
@@ -175,16 +175,16 @@ commands:
         "-emit-dependencies",
         "-emit-module",
         "-emit-module-path",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules/MediaSync.swiftmodule",
         "-output-file-map",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/output-file-map.json",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/output-file-map.json",
         "-whole-module-optimization",
         "-num-threads",
         "16",
         "-c",
-        "@/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
+        "@/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/MediaSync.build/sources",
         "-I",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/Modules",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/Modules",
         "-target",
         "arm64-apple-macosx14.0",
         "-whole-module-optimization",
@@ -196,7 +196,7 @@ commands:
         "-DSWIFT_PACKAGE",
         "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
         "-module-cache-path",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/.build/arm64-apple-macosx/release/ModuleCache",
+        "/Users/arnaudgct/Desktop/MediaSync/.build/arm64-apple-macosx/release/ModuleCache",
         "-parseable-output",
         "-Xfrontend",
         "-entry-point-function-name",
@@ -230,9 +230,9 @@ commands:
     tool: package-structure-tool
     inputs:
       [
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Sources/",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Package.swift",
-        "/Users/arnaudgct/Desktop/Adobe Premiere Monitor/MediaSync/Package.resolved",
+        "/Users/arnaudgct/Desktop/MediaSync/Sources/",
+        "/Users/arnaudgct/Desktop/MediaSync/Package.swift",
+        "/Users/arnaudgct/Desktop/MediaSync/Package.resolved",
       ]
     outputs: ["<PackageStructure>"]
     description: "Planning build"
