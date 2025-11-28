@@ -258,8 +258,8 @@ class MdiaSyncMonitor: ObservableObject {
             }
         }
         
-        // Timer plus rapide pour une meilleure réactivité visuelle
-        timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+        // Timer plus rapide pour une meilleure réactivité
+        timer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { [weak self] _ in
             self?.triggerCheck()
         }
     }

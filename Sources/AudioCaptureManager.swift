@@ -25,10 +25,13 @@ class AudioCaptureManager: NSObject, ObservableObject {
     private var targetApp: SCRunningApplication?
     
     // Paramètres de détection audio
-    private let audioThreshold: Float = 0.0005
-    private let silenceTimeout: TimeInterval = 0.4
+    private let audioThreshold: Float = 0.0003  // Seuil plus sensible
+    private let silenceTimeout: TimeInterval = 0.15  // Détection de silence plus rapide
+    private let stableStateDelay: TimeInterval = 0.08  // Délai avant changement d'état (anti-rebond)
     
     private var lastAudioDetectionTime: Date?
+    private var lastStateChangeTime: Date?
+    private var pendingState: Bool = false
     private var silenceTimer: Timer?
     private var appCheckTimer: Timer?
     
@@ -80,12 +83,22 @@ class AudioCaptureManager: NSObject, ObservableObject {
     func startMonitoring() {
         guard !isMonitoring else { return }
         
+        // Réinitialiser l'état pour forcer une nouvelle détection
+        isAppRunning = false
+        
         // Démarrer le timer de vérification d'app
         startAppCheckTimer()
         
-        // Tenter de démarrer la capture (si permission OK, ça marchera)
+        // Vérification immédiate au démarrage (sans attendre le timer)
         Task {
-            await setupAudioCapture()
+            // Petite attente pour laisser le temps aux permissions de s'initialiser
+            try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+            await checkAppStatusSilently()
+            
+            // Si l'app est déjà ouverte, forcer le setup
+            if isAppRunning && !isMonitoring && !isSettingUp {
+                await setupAudioCapture()
+            }
         }
     }
     
@@ -112,7 +125,7 @@ class AudioCaptureManager: NSObject, ObservableObject {
     
     private func startAppCheckTimer() {
         appCheckTimer?.invalidate()
-        appCheckTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+        appCheckTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             // Ne vérifier que si on a déjà la permission (pour éviter les pop-ups)
             if self.hasPermission || self.isMonitoring {
@@ -125,10 +138,15 @@ class AudioCaptureManager: NSObject, ObservableObject {
     
     /// Vérifie le statut de l'app SEULEMENT si on sait qu'on a la permission
     private func checkAppStatusSilently() async {
-        guard hasPermission || isMonitoring else { return }
+        // Permettre la vérification même sans permission confirmée (pour la détection initiale)
         
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+            
+            // Si on arrive ici sans erreur, on a la permission
+            if !hasPermission {
+                markPermissionGranted()
+            }
             
             let app = content.applications.first { app in
                 app.bundleIdentifier == self.appBundleIdentifier ||
@@ -142,8 +160,8 @@ class AudioCaptureManager: NSObject, ObservableObject {
                 self.isAppRunning = isNowRunning
             }
             
-            // App vient de démarrer
-            if isNowRunning && !wasRunning && !isMonitoring && !isSettingUp {
+            // App est là et on n'a pas de capture active -> démarrer la capture
+            if isNowRunning && !isMonitoring && !isSettingUp {
                 await setupAudioCapture()
             }
             
@@ -157,7 +175,7 @@ class AudioCaptureManager: NSObject, ObservableObject {
             }
             
         } catch {
-            // Erreur silencieuse - ne pas spammer
+            // Erreur silencieuse - permission probablement pas accordée
         }
     }
     
@@ -246,7 +264,7 @@ class AudioCaptureManager: NSObject, ObservableObject {
     
     private func startSilenceDetectionTimer() {
         silenceTimer?.invalidate()
-        silenceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { [weak self] _ in
             self?.checkForSilence()
         }
     }
@@ -254,12 +272,25 @@ class AudioCaptureManager: NSObject, ObservableObject {
     private func checkForSilence() {
         guard isMonitoring else { return }
         
+        let now = Date()
+        
         if let lastDetection = lastAudioDetectionTime {
-            let timeSinceLastAudio = Date().timeIntervalSince(lastDetection)
+            let timeSinceLastAudio = now.timeIntervalSince(lastDetection)
             
-            if timeSinceLastAudio > silenceTimeout && isAppPlaying {
-                DispatchQueue.main.async {
-                    self.isAppPlaying = false
+            // Déterminer l'état cible
+            let shouldBePlaying = timeSinceLastAudio <= silenceTimeout
+            
+            // Anti-rebond : ne changer l'état que si stable pendant stableStateDelay
+            if shouldBePlaying != pendingState {
+                pendingState = shouldBePlaying
+                lastStateChangeTime = now
+            } else if let stateChangeTime = lastStateChangeTime,
+                      now.timeIntervalSince(stateChangeTime) >= stableStateDelay {
+                // L'état est stable, appliquer le changement
+                if isAppPlaying != pendingState {
+                    DispatchQueue.main.async {
+                        self.isAppPlaying = self.pendingState
+                    }
                 }
             }
         }
@@ -297,9 +328,13 @@ class AudioCaptureManager: NSObject, ObservableObject {
         let rms = sqrt(sumValue / Float(frameCount))
         
         if rms > audioThreshold {
-            lastAudioDetectionTime = Date()
+            let now = Date()
+            lastAudioDetectionTime = now
             
+            // Mise à jour immédiate si pas en lecture (réactivité maximale pour le play)
             if !isAppPlaying {
+                pendingState = true
+                lastStateChangeTime = now
                 DispatchQueue.main.async {
                     self.isAppPlaying = true
                 }
