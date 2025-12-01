@@ -44,10 +44,15 @@ struct UpdateInfo {
 // MARK: - Update Checker
 @MainActor
 class UpdateChecker: ObservableObject {
-    // ⚠️ CONFIGURATION - Modifiez ces valeurs selon votre repository GitHub
+    // ⚠️ CONFIGURATION - Repository GitHub
     static let githubOwner = "ArnaudGct"
     static let githubRepo = "MediaSync"
-    static let currentVersion = "2.1.0"  // Version actuelle de l'app
+    static let currentVersion = "1.0.0"  // Version actuelle de l'app
+    
+    // URL directe pour les releases
+    static var releasesUrl: String {
+        "https://github.com/\(githubOwner)/\(githubRepo)/releases"
+    }
     
     @Published var updateAvailable: Bool = false
     @Published var latestUpdate: UpdateInfo?
@@ -59,11 +64,10 @@ class UpdateChecker: ObservableObject {
     @AppStorage("ignoredVersion") private var ignoredVersion: String = ""
     @AppStorage("lastUpdateCheck") private var lastUpdateCheckTimestamp: Double = 0
     
-    private let checkInterval: TimeInterval = 24 * 60 * 60 // 24 heures
+    private let checkInterval: TimeInterval = 6 * 60 * 60 // 6 heures (plus fréquent)
     
     init() {
-        // Vérifier au démarrage si nécessaire
-        checkForUpdatesIfNeeded()
+        // Ne pas vérifier automatiquement dans init pour éviter les blocages au démarrage
     }
     
     // MARK: - Public Methods
@@ -73,7 +77,7 @@ class UpdateChecker: ObservableObject {
         let lastCheck = Date(timeIntervalSince1970: lastUpdateCheckTimestamp)
         let timeSinceLastCheck = Date().timeIntervalSince(lastCheck)
         
-        if timeSinceLastCheck > checkInterval {
+        if timeSinceLastCheck > checkInterval || lastUpdateCheckTimestamp == 0 {
             Task {
                 await checkForUpdates()
             }
@@ -97,34 +101,53 @@ class UpdateChecker: ObservableObject {
             let release = try await fetchLatestRelease()
             
             if let release = release {
-                let latestVersion = release.tagName.replacingOccurrences(of: "v", with: "")
+                // Nettoyer le tag (enlever "v" ou "V" au début)
+                let latestVersion = release.tagName
+                    .trimmingCharacters(in: .whitespaces)
+                    .replacingOccurrences(of: "^[vV]", with: "", options: .regularExpression)
+                
+                print("📦 Version actuelle: \(Self.currentVersion)")
+                print("📦 Dernière version GitHub: \(latestVersion)")
                 
                 if isNewerVersion(latestVersion, than: Self.currentVersion) {
                     // Vérifier si l'utilisateur n'a pas ignoré cette version
                     if latestVersion != ignoredVersion {
                         // Trouver le DMG dans les assets
-                        let dmgAsset = release.assets.first { $0.name.hasSuffix(".dmg") }
+                        let dmgAsset = release.assets.first { $0.name.lowercased().hasSuffix(".dmg") }
                         
                         let dateFormatter = ISO8601DateFormatter()
-                        let publishedDate = dateFormatter.date(from: release.publishedAt) ?? Date()
+                        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                        var publishedDate = dateFormatter.date(from: release.publishedAt)
+                        
+                        // Fallback sans fractions de secondes
+                        if publishedDate == nil {
+                            dateFormatter.formatOptions = [.withInternetDateTime]
+                            publishedDate = dateFormatter.date(from: release.publishedAt)
+                        }
                         
                         latestUpdate = UpdateInfo(
                             version: latestVersion,
                             releaseNotes: release.body,
                             downloadUrl: dmgAsset?.browserDownloadUrl ?? release.htmlUrl,
                             releaseUrl: release.htmlUrl,
-                            publishedAt: publishedDate
+                            publishedAt: publishedDate ?? Date()
                         )
                         updateAvailable = true
+                        print("✅ Mise à jour disponible: \(latestVersion)")
+                    } else {
+                        print("⏭️ Version \(latestVersion) ignorée par l'utilisateur")
                     }
                 } else {
                     updateAvailable = false
                     latestUpdate = nil
+                    print("✅ Application à jour")
                 }
+            } else {
+                print("ℹ️ Aucune release trouvée sur GitHub")
             }
         } catch {
-            errorMessage = "Impossible de vérifier les mises à jour: \(error.localizedDescription)"
-            print("Update check error: \(error)")
+            errorMessage = "Impossible de vérifier les mises à jour"
+            print("❌ Erreur de vérification: \(error.localizedDescription)")
         }
     }
     
@@ -137,9 +160,21 @@ class UpdateChecker: ObservableObject {
         }
     }
     
+    /// Réinitialise la version ignorée (pour permettre de re-notifier)
+    func resetIgnoredVersion() {
+        ignoredVersion = ""
+    }
+    
     /// Ouvre la page de téléchargement
     func openDownloadPage() {
         if let update = latestUpdate, let url = URL(string: update.releaseUrl) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+    
+    /// Ouvre la page des releases GitHub
+    func openReleasesPage() {
+        if let url = URL(string: Self.releasesUrl) {
             NSWorkspace.shared.open(url)
         }
     }
@@ -162,7 +197,9 @@ class UpdateChecker: ObservableObject {
         
         var request = URLRequest(url: url)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 10
+        request.setValue("MediaSync/\(Self.currentVersion)", forHTTPHeaderField: "User-Agent")
+        request.timeoutInterval = 15
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
@@ -172,10 +209,18 @@ class UpdateChecker: ObservableObject {
         
         // 404 signifie qu'il n'y a pas encore de release
         if httpResponse.statusCode == 404 {
+            print("ℹ️ Pas de release sur GitHub (404)")
             return nil
         }
         
+        // Rate limiting
+        if httpResponse.statusCode == 403 {
+            print("⚠️ Rate limit GitHub atteint")
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         guard httpResponse.statusCode == 200 else {
+            print("⚠️ Réponse GitHub: \(httpResponse.statusCode)")
             throw URLError(.badServerResponse)
         }
         

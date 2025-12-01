@@ -18,11 +18,15 @@ enum DetectionMode: String, CaseIterable {
 
 // MARK: - Browser Tab Info
 struct BrowserTab: Identifiable, Hashable {
-    let id: String  // Unique identifier (domain)
+    let id: String  // Unique identifier: "browser:windowIndex:tabIndex"
+    let browser: String
+    let windowIndex: Int
+    let tabIndex: Int
+    let url: String
     let domain: String
     let title: String
-    var isEnabled: Bool
     var isPlaying: Bool
+    var isAudible: Bool  // Si l'onglet émet du son (pour Chromium)
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -33,22 +37,24 @@ struct BrowserTab: Identifiable, Hashable {
     }
 }
 
-class MdiaSyncMonitor: ObservableObject {
+class MediaSyncMonitor: ObservableObject {
     @Published var isRunning = false
     @Published var isPremiereActive = false
     @Published var isResolveActive = false
     @Published var isAfterEffectsActive = false
     @Published var isSpotifyPlaying = false
     @Published var isAppleMusicPlaying = false
+    @Published var activeApp: String = ""
+    @Published var hasScreenCapturePermission = false
+    @Published var hasBrowserJSPermission = false
+    
+    // Navigateurs - état de lecture détecté
     @Published var isBravePlaying = false
     @Published var isChromePlaying = false
     @Published var isEdgePlaying = false
     @Published var isOperaPlaying = false
     @Published var isArcPlaying = false
     @Published var isSafariPlaying = false
-    @Published var activeApp: String = ""
-    @Published var hasScreenCapturePermission = false
-    @Published var hasBrowserJSPermission = false  // Pour vérifier si "Allow JavaScript from Apple Events" est activé
     
     // MARK: - App Enable/Disable Settings (persistés)
     @Published var isPremiereEnabled: Bool {
@@ -86,8 +92,8 @@ class MdiaSyncMonitor: ObservableObject {
     }
     
     // MARK: - Browser Tabs Management
-    @Published var browserTabs: [BrowserTab] = []  // Onglets de tous les navigateurs
-    @Published var enabledDomains: Set<String> {  // Domaines autorisés pour la gestion
+    @Published var playingTabs: [BrowserTab] = []  // Onglets actuellement en lecture
+    @Published var enabledDomains: Set<String> {
         didSet {
             let array = Array(enabledDomains)
             UserDefaults.standard.set(array, forKey: "enabledBrowserDomains")
@@ -101,7 +107,6 @@ class MdiaSyncMonitor: ObservableObject {
     @Published var resolveDetectionMode: DetectionMode {
         didSet { UserDefaults.standard.set(resolveDetectionMode.rawValue, forKey: "resolveDetectionMode") }
     }
-    // After Effects utilise uniquement le mode audio (pmset ne fonctionne pas)
     
     var resumeDelay: Double = 1.0
     
@@ -115,15 +120,12 @@ class MdiaSyncMonitor: ObservableObject {
     
     private var audioCaptureObservers: [AnyCancellable] = []
     
-    // Track which music apps were playing before pause
+    // Track which apps were playing before pause
     private var spotifyWasPlaying = false
     private var appleMusicWasPlaying = false
-    private var braveWasPlaying = false
-    private var chromeWasPlaying = false
-    private var edgeWasPlaying = false
-    private var operaWasPlaying = false
-    private var arcWasPlaying = false
-    private var safariWasPlaying = false
+    
+    // Track paused browser tabs (by their unique ID)
+    private var pausedBrowserTabs: Set<String> = []
     
     private var silenceStartTime: Date?
     private var timer: Timer?
@@ -138,19 +140,33 @@ class MdiaSyncMonitor: ObservableObject {
         isSpotifyEnabled = UserDefaults.standard.object(forKey: "isSpotifyEnabled") as? Bool ?? true
         isAppleMusicEnabled = UserDefaults.standard.object(forKey: "isAppleMusicEnabled") as? Bool ?? true
         
-        // Navigateurs
-        isBraveEnabled = UserDefaults.standard.object(forKey: "isBraveEnabled") as? Bool ?? false
-        isChromeEnabled = UserDefaults.standard.object(forKey: "isChromeEnabled") as? Bool ?? false
-        isEdgeEnabled = UserDefaults.standard.object(forKey: "isEdgeEnabled") as? Bool ?? false
-        isOperaEnabled = UserDefaults.standard.object(forKey: "isOperaEnabled") as? Bool ?? false
-        isArcEnabled = UserDefaults.standard.object(forKey: "isArcEnabled") as? Bool ?? false
-        isSafariEnabled = UserDefaults.standard.object(forKey: "isSafariEnabled") as? Bool ?? false
+        // Navigateurs - activés par défaut pour que la détection fonctionne immédiatement
+        isBraveEnabled = UserDefaults.standard.object(forKey: "isBraveEnabled") as? Bool ?? true
+        isChromeEnabled = UserDefaults.standard.object(forKey: "isChromeEnabled") as? Bool ?? true
+        isEdgeEnabled = UserDefaults.standard.object(forKey: "isEdgeEnabled") as? Bool ?? true
+        isOperaEnabled = UserDefaults.standard.object(forKey: "isOperaEnabled") as? Bool ?? true
+        isArcEnabled = UserDefaults.standard.object(forKey: "isArcEnabled") as? Bool ?? true
+        isSafariEnabled = UserDefaults.standard.object(forKey: "isSafariEnabled") as? Bool ?? true
         
-        // Charger les domaines autorisés (par défaut: youtube, spotify web, soundcloud, deezer)
+        // Charger les domaines autorisés
         if let savedDomains = UserDefaults.standard.array(forKey: "enabledBrowserDomains") as? [String] {
             enabledDomains = Set(savedDomains)
         } else {
-            enabledDomains = Set(["youtube.com", "music.youtube.com", "open.spotify.com", "soundcloud.com", "deezer.com", "music.apple.com"])
+            // Domaines par défaut : streaming musical et vidéo populaires
+            enabledDomains = Set([
+                "youtube.com",
+                "music.youtube.com",
+                "open.spotify.com",
+                "soundcloud.com",
+                "deezer.com",
+                "music.apple.com",
+                "artlist.io",
+                "bandcamp.com",
+                "tidal.com",
+                "vimeo.com",
+                "twitch.tv",
+                "dailymotion.com"
+            ])
         }
         
         let premiereMode = UserDefaults.standard.string(forKey: "premiereDetectionMode") ?? "pmset"
@@ -351,64 +367,77 @@ class MdiaSyncMonitor: ObservableObject {
     
     /// Ouvre les préférences développeur d'un navigateur pour activer JavaScript from Apple Events
     func openBrowserDevSettings(browser: Browser) {
-        if browser == .safari {
-            // Pour Safari, ouvrir les préférences et afficher les instructions
-            let script = """
-            tell application "Safari"
-                activate
-            end tell
-            delay 0.5
-            tell application "System Events"
-                tell process "Safari"
-                    -- Essayer d'ouvrir les préférences via le menu
-                    try
-                        click menu item "Settings…" of menu "Safari" of menu bar 1
-                    on error
-                        try
-                            click menu item "Preferences…" of menu "Safari" of menu bar 1
-                        end try
-                    end try
-                end tell
-            end tell
-            """
-            _ = runAppleScript(script)
-        } else {
-            let script = """
-            tell application "\(browser.appName)"
-                activate
-            end tell
-            """
-            _ = runAppleScript(script)
-        }
-    }
-    
-    /// Vérifie si Safari a les permissions JavaScript activées
-    func checkSafariJSPermission() -> Bool {
         let script = """
-        tell application "Safari"
-            try
-                set t to current tab of front window
-                set jsResult to do JavaScript "true" in t
-                return "ok"
-            on error
-                return "no"
-            end try
+        tell application "\(browser.appName)"
+            activate
         end tell
         """
-        let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result == "ok"
+        _ = runAppleScript(script)
+    }
+    
+    /// Vérifie si un navigateur a les permissions JavaScript activées
+    func checkBrowserJSPermission(browser: Browser) -> Bool {
+        let jsTest = "true"
+        
+        if browser == .safari {
+            let script = """
+            tell application "System Events"
+                if not (exists process "Safari") then return "not_running"
+            end tell
+            tell application "Safari"
+                try
+                    if (count of windows) is 0 then return "no_window"
+                    if (count of tabs of front window) is 0 then return "no_tab"
+                    set jsResult to do JavaScript "\(jsTest)" in current tab of front window
+                    return "ok"
+                on error errMsg
+                    return "error:" & errMsg
+                end try
+            end tell
+            """
+            let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return result == "ok"
+        } else {
+            let script = """
+            tell application "System Events"
+                if not (exists process "\(browser.processName)") then return "not_running"
+            end tell
+            tell application "\(browser.appName)"
+                try
+                    if (count of windows) is 0 then return "no_window"
+                    set w to front window
+                    if (count of tabs of w) is 0 then return "no_tab"
+                    tell active tab of w
+                        set jsResult to execute javascript "\(jsTest)"
+                    end tell
+                    return "ok"
+                on error errMsg
+                    return "error:" & errMsg
+                end try
+            end tell
+            """
+            let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            return result == "ok"
+        }
     }
     
     // MARK: - Browser Tabs Management
     
-    /// Rafraîchit la liste des onglets avec des médias dans tous les navigateurs activés
-    func refreshBrowserTabs() {
+    /// Rafraîchit la liste des onglets en lecture
+    func refreshPlayingTabs() {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
             
-            var allTabs: [BrowserTab] = []
+            var allPlayingTabs: [BrowserTab] = []
+            var browserStates: [Browser: Bool] = [:]
             
-            // Récupérer les onglets de chaque navigateur Chromium activé
+            // Récupérer les onglets de chaque navigateur activé
+            if self.isSafariEnabled {
+                let tabs = self.getPlayingTabsFromSafari()
+                allPlayingTabs.append(contentsOf: tabs)
+                browserStates[.safari] = !tabs.isEmpty
+            }
+            
             let chromiumBrowsers: [(Browser, Bool)] = [
                 (.brave, self.isBraveEnabled),
                 (.chrome, self.isChromeEnabled),
@@ -419,28 +448,22 @@ class MdiaSyncMonitor: ObservableObject {
             
             for (browser, isEnabled) in chromiumBrowsers {
                 if isEnabled {
-                    let tabs = self.fetchChromiumTabsWithMedia(browser: browser)
-                    allTabs.append(contentsOf: tabs)
+                    let tabs = self.getPlayingTabsFromChromium(browser: browser)
+                    allPlayingTabs.append(contentsOf: tabs)
+                    browserStates[browser] = !tabs.isEmpty
                 }
-            }
-            
-            // Safari
-            if self.isSafariEnabled {
-                let safariTabs = self.fetchSafariTabsWithMedia()
-                allTabs.append(contentsOf: safariTabs)
             }
             
             DispatchQueue.main.async {
-                // Mettre à jour la liste en préservant l'état enabled des domaines existants
-                // Dédupliquer par domaine
-                var uniqueDomains = Set<String>()
-                self.browserTabs = allTabs.compactMap { tab in
-                    guard !uniqueDomains.contains(tab.domain) else { return nil }
-                    uniqueDomains.insert(tab.domain)
-                    var updatedTab = tab
-                    updatedTab.isEnabled = self.enabledDomains.contains(tab.domain)
-                    return updatedTab
-                }
+                self.playingTabs = allPlayingTabs
+                
+                // Mettre à jour les états de lecture des navigateurs
+                self.isSafariPlaying = browserStates[.safari] ?? false
+                self.isBravePlaying = browserStates[.brave] ?? false
+                self.isChromePlaying = browserStates[.chrome] ?? false
+                self.isEdgePlaying = browserStates[.edge] ?? false
+                self.isOperaPlaying = browserStates[.opera] ?? false
+                self.isArcPlaying = browserStates[.arc] ?? false
             }
         }
     }
@@ -452,126 +475,22 @@ class MdiaSyncMonitor: ObservableObject {
         } else {
             enabledDomains.insert(domain)
         }
-        
-        // Mettre à jour l'état des onglets
-        for i in browserTabs.indices {
-            if browserTabs[i].domain == domain {
-                browserTabs[i].isEnabled = enabledDomains.contains(domain)
-            }
+    }
+    
+    /// Vérifie si un domaine est autorisé (match partiel)
+    private func isDomainEnabled(_ host: String) -> Bool {
+        let normalizedHost = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+        return enabledDomains.contains { enabledDomain in
+            normalizedHost.contains(enabledDomain) || enabledDomain.contains(normalizedHost)
         }
     }
     
-    /// Récupère tous les onglets d'un navigateur Chromium qui ont des éléments média
-    private func fetchChromiumTabsWithMedia(browser: Browser) -> [BrowserTab] {
-        let script = """
-        tell application "System Events"
-            if not (exists process "\(browser.processName)") then return ""
-        end tell
-        
-        tell application "\(browser.appName)"
-            set tabInfoList to ""
-            try
-                set windowList to every window
-                repeat with w in windowList
-                    set tabList to every tab of w
-                    repeat with t in tabList
-                        try
-                            tell t
-                                set tabURL to URL
-                                set tabTitle to title
-                                set hasMedia to execute javascript "(function() { return document.querySelectorAll('video, audio').length > 0 ? 'yes' : 'no'; })()"
-                                set isPlaying to execute javascript "(function() { var m = document.querySelectorAll('video, audio'); for (var i = 0; i < m.length; i++) { if (!m[i].paused && !m[i].ended) return 'yes'; } return 'no'; })()"
-                                if hasMedia is "yes" then
-                                    set tabInfoList to tabInfoList & tabURL & "|||" & tabTitle & "|||" & isPlaying & "\\n"
-                                end if
-                            end tell
-                        end try
-                    end repeat
-                end repeat
-            end try
-            return tabInfoList
-        end tell
-        """
-        
-        guard let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !result.isEmpty else {
-            return []
+    /// Extrait le domaine d'une URL
+    private func extractDomain(from urlString: String) -> String {
+        guard let url = URL(string: urlString), let host = url.host else {
+            return urlString
         }
-        
-        return parseTabsFromResult(result)
-    }
-    
-    /// Récupère tous les onglets Safari qui ont des éléments média
-    private func fetchSafariTabsWithMedia() -> [BrowserTab] {
-        let script = """
-        tell application "System Events"
-            if not (exists process "Safari") then return ""
-        end tell
-        
-        tell application "Safari"
-            set tabInfoList to ""
-            try
-                set windowList to every window
-                repeat with w in windowList
-                    set tabList to every tab of w
-                    repeat with t in tabList
-                        try
-                            set tabURL to URL of t
-                            set tabTitle to name of t
-                            set hasMedia to do JavaScript "(function() { return document.querySelectorAll('video, audio').length > 0 ? 'yes' : 'no'; })()" in t
-                            set isPlaying to do JavaScript "(function() { var m = document.querySelectorAll('video, audio'); for (var i = 0; i < m.length; i++) { if (!m[i].paused && !m[i].ended) return 'yes'; } return 'no'; })()" in t
-                            if hasMedia is "yes" then
-                                set tabInfoList to tabInfoList & tabURL & "|||" & tabTitle & "|||" & isPlaying & "\\n"
-                            end if
-                        end try
-                    end repeat
-                end repeat
-            end try
-            return tabInfoList
-        end tell
-        """
-        
-        guard let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !result.isEmpty else {
-            return []
-        }
-        
-        return parseTabsFromResult(result)
-    }
-    
-    /// Parse les résultats d'onglets en BrowserTab
-    private func parseTabsFromResult(_ result: String) -> [BrowserTab] {
-        var tabs: [BrowserTab] = []
-        let lines = result.components(separatedBy: "\n").filter { !$0.isEmpty }
-        
-        for line in lines {
-            let parts = line.components(separatedBy: "|||")
-            if parts.count >= 3 {
-                let url = parts[0]
-                let title = parts[1]
-                let isPlaying = parts[2] == "yes"
-                
-                // Extraire le domaine de l'URL
-                if let urlObj = URL(string: url), let host = urlObj.host {
-                    // Simplifier le domaine (enlever www.)
-                    let domain = host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
-                    
-                    // Éviter les doublons de domaine
-                    if !tabs.contains(where: { $0.domain == domain }) {
-                        let tab = BrowserTab(
-                            id: domain,
-                            domain: domain,
-                            title: title,
-                            isEnabled: enabledDomains.contains(domain),
-                            isPlaying: isPlaying
-                        )
-                        tabs.append(tab)
-                    }
-                }
-            }
-        }
-        
-        return tabs
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
     }
     
     // MARK: - Detection Mode Methods
@@ -609,21 +528,14 @@ class MdiaSyncMonitor: ObservableObject {
         guard !isChecking else { return }
         isChecking = true
         
-        // Exécuter les vérifications en parallèle sur un thread séparé
+        // Exécuter les vérifications sur un thread séparé
         monitorQueue.async { [weak self] in
             guard let self = self else { return }
             
-            // Vérifications en parallèle
             var premiereActive = false
             var resolveActive = false
             var spotifyPlaying = false
             var appleMusicPlaying = false
-            var bravePlaying = false
-            var chromePlaying = false
-            var edgePlaying = false
-            var operaPlaying = false
-            var arcPlaying = false
-            var safariPlaying = false
             
             // After Effects est toujours géré par AudioCaptureManager
             let afterEffectsActive = self.isAfterEffectsEnabled ? self.isAfterEffectsActive : false
@@ -638,7 +550,6 @@ class MdiaSyncMonitor: ObservableObject {
                     group.leave()
                 }
             } else if self.isPremiereEnabled && self.premiereDetectionMode == .audio {
-                // Le mode audio est géré par l'observer, on récupère juste la valeur actuelle
                 premiereActive = self.isPremiereActive
             }
             
@@ -653,7 +564,7 @@ class MdiaSyncMonitor: ObservableObject {
                 resolveActive = self.isResolveActive
             }
             
-            // Check music players in parallel (seulement si activés)
+            // Check music players
             if self.isSpotifyEnabled {
                 group.enter()
                 DispatchQueue.global(qos: .userInteractive).async {
@@ -670,56 +581,35 @@ class MdiaSyncMonitor: ObservableObject {
                 }
             }
             
-            // Check all browsers in parallel
-            if self.isBraveEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    bravePlaying = self.checkBrowserMediaStatus(browser: .brave)
-                    group.leave()
-                }
-            }
+            // Check browsers playing status (en parallèle)
+            var browserPlayingStatus: [Browser: Bool] = [:]
+            let browserGroup = DispatchGroup()
+            let statusLock = NSLock()
             
-            if self.isChromeEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    chromePlaying = self.checkBrowserMediaStatus(browser: .chrome)
-                    group.leave()
-                }
-            }
+            let browsersToCheck: [(Browser, Bool)] = [
+                (.safari, self.isSafariEnabled),
+                (.brave, self.isBraveEnabled),
+                (.chrome, self.isChromeEnabled),
+                (.edge, self.isEdgeEnabled),
+                (.opera, self.isOperaEnabled),
+                (.arc, self.isArcEnabled)
+            ]
             
-            if self.isEdgeEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    edgePlaying = self.checkBrowserMediaStatus(browser: .edge)
-                    group.leave()
-                }
-            }
-            
-            if self.isOperaEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    operaPlaying = self.checkBrowserMediaStatus(browser: .opera)
-                    group.leave()
-                }
-            }
-            
-            if self.isArcEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    arcPlaying = self.checkBrowserMediaStatus(browser: .arc)
-                    group.leave()
-                }
-            }
-            
-            if self.isSafariEnabled {
-                group.enter()
-                DispatchQueue.global(qos: .userInteractive).async {
-                    safariPlaying = self.checkBrowserMediaStatus(browser: .safari)
-                    group.leave()
+            for (browser, isEnabled) in browsersToCheck {
+                if isEnabled {
+                    browserGroup.enter()
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        let isPlaying = self.checkBrowserHasPlayingMedia(browser: browser)
+                        statusLock.lock()
+                        browserPlayingStatus[browser] = isPlaying
+                        statusLock.unlock()
+                        browserGroup.leave()
+                    }
                 }
             }
             
             group.wait()
+            browserGroup.wait()
             
             // Déterminer quelle app de montage est active
             let editingAppActive = premiereActive || resolveActive || afterEffectsActive
@@ -734,9 +624,8 @@ class MdiaSyncMonitor: ObservableObject {
                 currentActiveApp = ""
             }
             
-            // Mise à jour UI immédiate
+            // Mise à jour UI
             DispatchQueue.main.async {
-                // Mettre à jour seulement si en mode pmset (sinon c'est l'observer qui gère)
                 if self.isPremiereEnabled && self.premiereDetectionMode == .pmset {
                     self.isPremiereActive = premiereActive
                 } else if !self.isPremiereEnabled {
@@ -751,61 +640,50 @@ class MdiaSyncMonitor: ObservableObject {
                 
                 self.isSpotifyPlaying = self.isSpotifyEnabled ? spotifyPlaying : false
                 self.isAppleMusicPlaying = self.isAppleMusicEnabled ? appleMusicPlaying : false
-                self.isBravePlaying = self.isBraveEnabled ? bravePlaying : false
-                self.isChromePlaying = self.isChromeEnabled ? chromePlaying : false
-                self.isEdgePlaying = self.isEdgeEnabled ? edgePlaying : false
-                self.isOperaPlaying = self.isOperaEnabled ? operaPlaying : false
-                self.isArcPlaying = self.isArcEnabled ? arcPlaying : false
-                self.isSafariPlaying = self.isSafariEnabled ? safariPlaying : false
+                
+                // Update browser playing states
+                self.isSafariPlaying = browserPlayingStatus[.safari] ?? false
+                self.isBravePlaying = browserPlayingStatus[.brave] ?? false
+                self.isChromePlaying = browserPlayingStatus[.chrome] ?? false
+                self.isEdgePlaying = browserPlayingStatus[.edge] ?? false
+                self.isOperaPlaying = browserPlayingStatus[.opera] ?? false
+                self.isArcPlaying = browserPlayingStatus[.arc] ?? false
+                
                 self.activeApp = currentActiveApp
             }
             
             // Calculer si un navigateur joue de la musique
-            let anyBrowserPlaying = bravePlaying || chromePlaying || edgePlaying || operaPlaying || arcPlaying || safariPlaying
+            let anyBrowserPlaying = browserPlayingStatus.values.contains(true)
             
-            // Logique de contrôle des lecteurs de musique
+            // Logique de contrôle
             if editingAppActive {
                 self.silenceStartTime = nil
                 
-                // Pause les apps de musique activées
+                // Pause Spotify si activé et en lecture
                 if self.isSpotifyEnabled && spotifyPlaying {
                     self.controlMusicPlayer(app: .spotify, action: "pause")
                     self.spotifyWasPlaying = true
                 }
+                
+                // Pause Apple Music si activé et en lecture
                 if self.isAppleMusicEnabled && appleMusicPlaying {
                     self.controlMusicPlayer(app: .appleMusic, action: "pause")
                     self.appleMusicWasPlaying = true
                 }
                 
-                // Pause tous les navigateurs activés
-                if self.isBraveEnabled && bravePlaying {
-                    self.controlBrowserMedia(browser: .brave, action: .pause)
-                    self.braveWasPlaying = true
+                // Pause tous les navigateurs avec des médias en lecture
+                if anyBrowserPlaying {
+                    self.pauseAllBrowserTabs()
                 }
-                if self.isChromeEnabled && chromePlaying {
-                    self.controlBrowserMedia(browser: .chrome, action: .pause)
-                    self.chromeWasPlaying = true
-                }
-                if self.isEdgeEnabled && edgePlaying {
-                    self.controlBrowserMedia(browser: .edge, action: .pause)
-                    self.edgeWasPlaying = true
-                }
-                if self.isOperaEnabled && operaPlaying {
-                    self.controlBrowserMedia(browser: .opera, action: .pause)
-                    self.operaWasPlaying = true
-                }
-                if self.isArcEnabled && arcPlaying {
-                    self.controlBrowserMedia(browser: .arc, action: .pause)
-                    self.arcWasPlaying = true
-                }
-                if self.isSafariEnabled && safariPlaying {
-                    self.controlBrowserMedia(browser: .safari, action: .pause)
-                    self.safariWasPlaying = true
-                }
+                
             } else {
                 // Resume logic
-                let anyMusicPlaying = (self.isSpotifyEnabled && spotifyPlaying) || (self.isAppleMusicEnabled && appleMusicPlaying) || anyBrowserPlaying
-                let anyWasPlaying = self.spotifyWasPlaying || self.appleMusicWasPlaying || self.braveWasPlaying || self.chromeWasPlaying || self.edgeWasPlaying || self.operaWasPlaying || self.arcWasPlaying || self.safariWasPlaying
+                let anyMusicPlaying = (self.isSpotifyEnabled && spotifyPlaying) || 
+                                      (self.isAppleMusicEnabled && appleMusicPlaying) || 
+                                      anyBrowserPlaying
+                let anyWasPlaying = self.spotifyWasPlaying || 
+                                    self.appleMusicWasPlaying || 
+                                    !self.pausedBrowserTabs.isEmpty
                 
                 if anyWasPlaying && !anyMusicPlaying {
                     if self.silenceStartTime == nil {
@@ -814,7 +692,7 @@ class MdiaSyncMonitor: ObservableObject {
                     
                     if let startTime = self.silenceStartTime,
                        Date().timeIntervalSince(startTime) >= self.resumeDelay {
-                        // Resume apps that were playing
+                        // Resume apps
                         if self.spotifyWasPlaying && self.isSpotifyEnabled {
                             self.controlMusicPlayer(app: .spotify, action: "play")
                             self.spotifyWasPlaying = false
@@ -824,42 +702,16 @@ class MdiaSyncMonitor: ObservableObject {
                             self.appleMusicWasPlaying = false
                         }
                         
-                        // Resume tous les navigateurs
-                        if self.braveWasPlaying && self.isBraveEnabled {
-                            self.controlBrowserMedia(browser: .brave, action: .play)
-                            self.braveWasPlaying = false
-                        }
-                        if self.chromeWasPlaying && self.isChromeEnabled {
-                            self.controlBrowserMedia(browser: .chrome, action: .play)
-                            self.chromeWasPlaying = false
-                        }
-                        if self.edgeWasPlaying && self.isEdgeEnabled {
-                            self.controlBrowserMedia(browser: .edge, action: .play)
-                            self.edgeWasPlaying = false
-                        }
-                        if self.operaWasPlaying && self.isOperaEnabled {
-                            self.controlBrowserMedia(browser: .opera, action: .play)
-                            self.operaWasPlaying = false
-                        }
-                        if self.arcWasPlaying && self.isArcEnabled {
-                            self.controlBrowserMedia(browser: .arc, action: .play)
-                            self.arcWasPlaying = false
-                        }
-                        if self.safariWasPlaying && self.isSafariEnabled {
-                            self.controlBrowserMedia(browser: .safari, action: .play)
-                            self.safariWasPlaying = false
-                        }
+                        // Resume browser tabs
+                        self.resumePausedBrowserTabs()
+                        
                         self.silenceStartTime = nil
                     }
                 } else if anyMusicPlaying {
+                    // Si quelque chose joue, réinitialiser les états "was playing"
                     self.spotifyWasPlaying = false
                     self.appleMusicWasPlaying = false
-                    self.braveWasPlaying = false
-                    self.chromeWasPlaying = false
-                    self.edgeWasPlaying = false
-                    self.operaWasPlaying = false
-                    self.arcWasPlaying = false
-                    self.safariWasPlaying = false
+                    self.pausedBrowserTabs.removeAll()
                     self.silenceStartTime = nil
                 }
             }
@@ -1009,6 +861,17 @@ class MdiaSyncMonitor: ObservableObject {
             case .safari: return "Safari"
             }
         }
+        
+        var identifier: String {
+            switch self {
+            case .brave: return "brave"
+            case .chrome: return "chrome"
+            case .edge: return "edge"
+            case .opera: return "opera"
+            case .arc: return "arc"
+            case .safari: return "safari"
+            }
+        }
     }
     
     enum BrowserMediaAction {
@@ -1016,139 +879,350 @@ class MdiaSyncMonitor: ObservableObject {
         case play
     }
     
-    /// Construit une liste de domaines autorisés pour le JavaScript
-    private func buildEnabledDomainsJS() -> String {
-        let domains = enabledDomains.map { "'\($0)'" }.joined(separator: ",")
-        return "[\(domains)]"
+    // MARK: - Safari Tab Detection & Control
+    
+    /// JavaScript universel pour détecter si un média joue dans un onglet
+    /// Détecte: HTML5 audio/video, Spotify, Deezer, YouTube Music, SoundCloud, Tidal, etc.
+    /// NOTE: Utilise des guillemets simples pour éviter les problèmes d'échappement AppleScript
+    private func getMediaDetectionJS() -> String {
+        return """
+        (function(){try{var media=document.querySelectorAll('video,audio');for(var i=0;i<media.length;i++){var m=media[i];if(!m.paused&&!m.ended&&m.readyState>2&&m.currentTime>0)return'playing';}var iframes=document.querySelectorAll('iframe');for(var j=0;j<iframes.length;j++){try{var iframeDoc=iframes[j].contentDocument||iframes[j].contentWindow.document;if(iframeDoc){var iframeMedia=iframeDoc.querySelectorAll('video,audio');for(var k=0;k<iframeMedia.length;k++){var im=iframeMedia[k];if(!im.paused&&!im.ended&&im.readyState>2&&im.currentTime>0)return'playing';}}}catch(e){}}var spotifyPause=document.querySelector('[data-testid=control-button-playpause][aria-label*=Pause]');if(spotifyPause)return'playing';var deezerPause=document.querySelector('[data-testid=play_button_pause]');if(deezerPause)return'playing';var ytMusicPause=document.querySelector('#play-pause-button[aria-label*=Pause],.play-pause-button[title*=Pause]');if(ytMusicPause)return'playing';var soundcloudPlaying=document.querySelector('.playControl.playing,.sc-button-pause');if(soundcloudPlaying)return'playing';var tidalPause=document.querySelector('[data-test=pause]');if(tidalPause)return'playing';var appleMusicPause=document.querySelector('.web-chrome-playback-controls__playback-btn--pause');if(appleMusicPause)return'playing';var amazonPause=document.querySelector('[data-testid=transport-pause-button]');if(amazonPause)return'playing';var bandcampPlaying=document.querySelector('.playbutton.playing');if(bandcampPlaying)return'playing';var twitchVideo=document.querySelector('video[playsinline]');if(twitchVideo&&!twitchVideo.paused)return'playing';return'no';}catch(e){return'no';}})()
+        """
     }
     
-    /// Vérifie si un média joue dans un navigateur (seulement sur les domaines autorisés)
-    private func checkBrowserMediaStatus(browser: Browser) -> Bool {
-        // D'abord vérifier si le navigateur est lancé
-        let checkRunning = """
+    /// JavaScript universel pour mettre en pause tous les médias
+    private func getMediaPauseJS() -> String {
+        return """
+        (function(){try{document.querySelectorAll('video,audio').forEach(function(e){if(!e.paused)e.pause();});document.querySelectorAll('iframe').forEach(function(iframe){try{var doc=iframe.contentDocument||iframe.contentWindow.document;if(doc)doc.querySelectorAll('video,audio').forEach(function(e){if(!e.paused)e.pause();});}catch(e){}});var spotifyPause=document.querySelector('[data-testid=control-button-playpause][aria-label*=Pause]');if(spotifyPause){spotifyPause.click();return'paused';}var deezerPause=document.querySelector('[data-testid=play_button_pause]');if(deezerPause){deezerPause.click();return'paused';}var ytMusicPause=document.querySelector('#play-pause-button[aria-label*=Pause],.play-pause-button[title*=Pause]');if(ytMusicPause){ytMusicPause.click();return'paused';}var soundcloudPause=document.querySelector('.playControl.playing');if(soundcloudPause){soundcloudPause.click();return'paused';}var tidalPause=document.querySelector('[data-test=pause]');if(tidalPause){tidalPause.click();return'paused';}var appleMusicPause=document.querySelector('.web-chrome-playback-controls__playback-btn--pause');if(appleMusicPause){appleMusicPause.click();return'paused';}var amazonPause=document.querySelector('[data-testid=transport-pause-button]');if(amazonPause){amazonPause.click();return'paused';}var bandcampPause=document.querySelector('.playbutton.playing');if(bandcampPause){bandcampPause.click();return'paused';}return'none';}catch(e){return'error';}})()
+        """
+    }
+    
+    /// JavaScript universel pour reprendre la lecture
+    private func getMediaPlayJS() -> String {
+        return """
+        (function(){try{var media=document.querySelectorAll('video,audio');for(var i=0;i<media.length;i++){var m=media[i];if(m.paused&&m.currentTime>0&&!m.ended){m.play();return'resumed';}}var spotifyPlay=document.querySelector('[data-testid=control-button-playpause][aria-label*=Play],[data-testid=control-button-playpause][aria-label*=Lecture]');if(spotifyPlay){spotifyPlay.click();return'resumed';}var deezerPlay=document.querySelector('[data-testid=play_button_play]');if(deezerPlay){deezerPlay.click();return'resumed';}var ytMusicPlay=document.querySelector('#play-pause-button[aria-label*=Play],#play-pause-button[aria-label*=Lecture],.play-pause-button[title*=Play],.play-pause-button[title*=Lecture]');if(ytMusicPlay){ytMusicPlay.click();return'resumed';}var soundcloudPlay=document.querySelector('.playControl:not(.playing)');if(soundcloudPlay){soundcloudPlay.click();return'resumed';}var tidalPlay=document.querySelector('[data-test=play]');if(tidalPlay){tidalPlay.click();return'resumed';}var appleMusicPlay=document.querySelector('.web-chrome-playback-controls__playback-btn--play');if(appleMusicPlay){appleMusicPlay.click();return'resumed';}var amazonPlay=document.querySelector('[data-testid=transport-play-button]');if(amazonPlay){amazonPlay.click();return'resumed';}var bandcampPlay=document.querySelector('.playbutton:not(.playing)');if(bandcampPlay){bandcampPlay.click();return'resumed';}return'none';}catch(e){return'error';}})()
+        """
+    }
+    
+    /// Récupère les onglets Safari qui jouent actuellement de l'audio sur les domaines autorisés
+    private func getPlayingTabsFromSafari() -> [BrowserTab] {
+        let jsCode = getMediaDetectionJS()
+        
+        let script = """
         tell application "System Events"
-            return exists process "\(browser.processName)"
+            if not (exists process "Safari") then return ""
+        end tell
+        
+        tell application "Safari"
+            set resultList to ""
+            try
+                set winIndex to 0
+                repeat with w in (every window)
+                    set winIndex to winIndex + 1
+                    set tabIndex to 0
+                    repeat with t in (every tab of w)
+                        set tabIndex to tabIndex + 1
+                        try
+                            set tabURL to URL of t
+                            set tabTitle to name of t
+                            set playState to do JavaScript "\(jsCode)" in t
+                            if playState is "playing" then
+                                set resultList to resultList & winIndex & ":::" & tabIndex & ":::" & tabURL & ":::" & tabTitle & "\\n"
+                            end if
+                        end try
+                    end repeat
+                end repeat
+            end try
+            return resultList
         end tell
         """
         
-        guard let isRunning = runAppleScript(checkRunning)?.trimmingCharacters(in: .whitespacesAndNewlines),
-              isRunning == "true" else {
-            return false
+        guard let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !result.isEmpty else {
+            return []
         }
         
-        let enabledDomainsJS = buildEnabledDomainsJS()
-        let result: String?
+        var tabs: [BrowserTab] = []
+        let lines = result.components(separatedBy: "\n").filter { !$0.isEmpty }
         
-        if browser.isChromium {
-            // Navigateurs Chromium (Brave, Chrome, Edge, Opera, Arc)
-            let script = """
-            tell application "\(browser.appName)"
-                set mediaPlaying to false
-                try
-                    set windowList to every window
-                    repeat with w in windowList
-                        set tabList to every tab of w
-                        repeat with t in tabList
-                            try
-                                tell t
-                                    set tabURL to URL
-                                    set checkResult to execute javascript "(function() { var dominated = \(enabledDomainsJS); var host = window.location.hostname.replace('www.', ''); var isAllowed = dominated.some(function(d) { return host.indexOf(d) !== -1; }); if (!isAllowed) return 'skip'; var m = document.querySelectorAll('video, audio'); for (var i = 0; i < m.length; i++) { if (!m[i].paused && !m[i].ended) return 'playing'; } return 'no'; })()"
-                                    if checkResult is "playing" then
-                                        set mediaPlaying to true
-                                        exit repeat
-                                    end if
-                                end tell
-                            end try
-                        end repeat
-                        if mediaPlaying then exit repeat
-                    end repeat
-                end try
-                return mediaPlaying
-            end tell
-            """
-            result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        } else {
-            // Safari - syntaxe différente
-            let script = """
-            tell application "Safari"
-                set mediaPlaying to false
-                try
-                    set windowList to every window
-                    repeat with w in windowList
-                        set tabList to every tab of w
-                        repeat with t in tabList
-                            try
-                                set tabURL to URL of t
-                                set checkResult to do JavaScript "(function() { var dominated = \(enabledDomainsJS); var host = window.location.hostname.replace('www.', ''); var isAllowed = dominated.some(function(d) { return host.indexOf(d) !== -1; }); if (!isAllowed) return 'skip'; var m = document.querySelectorAll('video, audio'); for (var i = 0; i < m.length; i++) { if (!m[i].paused && !m[i].ended) return 'playing'; } return 'no'; })()" in t
-                                if checkResult is "playing" then
-                                    set mediaPlaying to true
-                                    exit repeat
-                                end if
-                            end try
-                        end repeat
-                        if mediaPlaying then exit repeat
-                    end repeat
-                end try
-                return mediaPlaying
-            end tell
-            """
-            result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        
-        // Si on obtient une réponse valide, la permission JS est accordée
-        if result == "true" || result == "false" {
-            DispatchQueue.main.async {
-                self.hasBrowserJSPermission = true
-                UserDefaults.standard.set(true, forKey: "hasBrowserJSPermission")
+        for line in lines {
+            let parts = line.components(separatedBy: ":::")
+            if parts.count >= 4,
+               let winIndex = Int(parts[0]),
+               let tabIndex = Int(parts[1]) {
+                let url = parts[2]
+                let title = parts[3]
+                let domain = extractDomain(from: url)
+                
+                // Vérifier si ce domaine est autorisé
+                guard isDomainEnabled(domain) else { continue }
+                
+                let tabId = "safari:\(winIndex):\(tabIndex)"
+                let tab = BrowserTab(
+                    id: tabId,
+                    browser: "safari",
+                    windowIndex: winIndex,
+                    tabIndex: tabIndex,
+                    url: url,
+                    domain: domain,
+                    title: title,
+                    isPlaying: true,
+                    isAudible: true
+                )
+                tabs.append(tab)
             }
         }
         
-        return result == "true"
+        return tabs
     }
     
-    /// Contrôle la lecture média dans un navigateur (seulement sur les domaines autorisés)
-    private func controlBrowserMedia(browser: Browser, action: BrowserMediaAction) {
-        let jsAction = action == .pause ? "pause()" : "play()"
-        let enabledDomainsJS = buildEnabledDomainsJS()
+    /// Met en pause un onglet Safari spécifique
+    private func pauseSafariTab(windowIndex: Int, tabIndex: Int) {
+        let jsCode = getMediaPauseJS()
         
-        if browser.isChromium {
-            // Navigateurs Chromium
-            let script = """
-            tell application "\(browser.appName)"
-                try
-                    set windowList to every window
-                    repeat with w in windowList
-                        set tabList to every tab of w
-                        repeat with t in tabList
-                            try
-                                tell t
-                                    execute javascript "(function() { var dominated = \(enabledDomainsJS); var host = window.location.hostname.replace('www.', ''); var isAllowed = dominated.some(function(d) { return host.indexOf(d) !== -1; }); if (!isAllowed) return; document.querySelectorAll('video, audio').forEach(function(e) { e.\(jsAction); }); })()"
-                                end tell
-                            end try
-                        end repeat
+        let script = """
+        tell application "Safari"
+            try
+                set w to window \(windowIndex)
+                set t to tab \(tabIndex) of w
+                do JavaScript "\(jsCode)" in t
+            end try
+        end tell
+        """
+        _ = runAppleScript(script)
+    }
+    
+    /// Reprend la lecture sur un onglet Safari spécifique
+    private func playSafariTab(windowIndex: Int, tabIndex: Int) {
+        let jsCode = getMediaPlayJS()
+        
+        let script = """
+        tell application "Safari"
+            try
+                set w to window \(windowIndex)
+                set t to tab \(tabIndex) of w
+                do JavaScript "\(jsCode)" in t
+            end try
+        end tell
+        """
+        _ = runAppleScript(script)
+    }
+    
+    // MARK: - Chromium Tab Detection & Control
+    
+    /// Récupère les onglets Chromium qui jouent actuellement de l'audio sur les domaines autorisés
+    private func getPlayingTabsFromChromium(browser: Browser) -> [BrowserTab] {
+        guard browser.isChromium else { return [] }
+        
+        let jsCode = getMediaDetectionJS()
+        
+        let script = """
+        tell application "System Events"
+            if not (exists process "\(browser.processName)") then return ""
+        end tell
+        
+        tell application "\(browser.appName)"
+            set resultList to ""
+            try
+                set winIndex to 0
+                repeat with w in (every window)
+                    set winIndex to winIndex + 1
+                    set tabIndex to 0
+                    repeat with t in (every tab of w)
+                        set tabIndex to tabIndex + 1
+                        try
+                            tell t
+                                set tabURL to URL
+                                set tabTitle to title
+                                set playState to execute javascript "\(jsCode)"
+                                if playState is "playing" then
+                                    set resultList to resultList & winIndex & ":::" & tabIndex & ":::" & tabURL & ":::" & tabTitle & "\\n"
+                                end if
+                            end tell
+                        end try
                     end repeat
-                end try
-            end tell
-            """
-            _ = runAppleScript(script)
+                end repeat
+            end try
+            return resultList
+        end tell
+        """
+        
+        guard let result = runAppleScript(script)?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !result.isEmpty else {
+            return []
+        }
+        
+        var tabs: [BrowserTab] = []
+        let lines = result.components(separatedBy: "\n").filter { !$0.isEmpty }
+        
+        for line in lines {
+            let parts = line.components(separatedBy: ":::")
+            if parts.count >= 4,
+               let winIndex = Int(parts[0]),
+               let tabIndex = Int(parts[1]) {
+                let url = parts[2]
+                let title = parts[3]
+                let domain = extractDomain(from: url)
+                
+                // Vérifier si ce domaine est autorisé
+                guard isDomainEnabled(domain) else { continue }
+                
+                let tabId = "\(browser.identifier):\(winIndex):\(tabIndex)"
+                let tab = BrowserTab(
+                    id: tabId,
+                    browser: browser.identifier,
+                    windowIndex: winIndex,
+                    tabIndex: tabIndex,
+                    url: url,
+                    domain: domain,
+                    title: title,
+                    isPlaying: true,
+                    isAudible: true
+                )
+                tabs.append(tab)
+            }
+        }
+        
+        return tabs
+    }
+    
+    /// Fallback: détection via JavaScript pour Chromium (gardé pour compatibilité)
+    private func getPlayingTabsFromChromiumJS(browser: Browser) -> [BrowserTab] {
+        return getPlayingTabsFromChromium(browser: browser)
+    }
+    
+    /// Met en pause un onglet Chromium spécifique
+    private func pauseChromiumTab(browser: Browser, windowIndex: Int, tabIndex: Int) {
+        guard browser.isChromium else { return }
+        
+        let jsCode = getMediaPauseJS()
+        
+        let script = """
+        tell application "\(browser.appName)"
+            try
+                set w to window \(windowIndex)
+                set t to tab \(tabIndex) of w
+                tell t
+                    execute javascript "\(jsCode)"
+                end tell
+            end try
+        end tell
+        """
+        _ = runAppleScript(script)
+    }
+    
+    /// Reprend la lecture sur un onglet Chromium spécifique
+    private func playChromiumTab(browser: Browser, windowIndex: Int, tabIndex: Int) {
+        guard browser.isChromium else { return }
+        
+        let jsCode = getMediaPlayJS()
+        
+        let script = """
+        tell application "\(browser.appName)"
+            try
+                set w to window \(windowIndex)
+                set t to tab \(tabIndex) of w
+                tell t
+                    execute javascript "\(jsCode)"
+                end tell
+            end try
+        end tell
+        """
+        _ = runAppleScript(script)
+    }
+    
+    // MARK: - Browser Control Helpers
+    
+    /// Met en pause tous les onglets en lecture sur les domaines autorisés
+    private func pauseAllBrowserTabs() {
+        // Safari
+        if isSafariEnabled {
+            let safariTabs = getPlayingTabsFromSafari()
+            for tab in safariTabs {
+                pauseSafariTab(windowIndex: tab.windowIndex, tabIndex: tab.tabIndex)
+                pausedBrowserTabs.insert(tab.id)
+            }
+            
+            DispatchQueue.main.async {
+                self.isSafariPlaying = false
+            }
+        }
+        
+        // Navigateurs Chromium
+        let chromiumBrowsers: [(Browser, Bool)] = [
+            (.brave, isBraveEnabled),
+            (.chrome, isChromeEnabled),
+            (.edge, isEdgeEnabled),
+            (.opera, isOperaEnabled),
+            (.arc, isArcEnabled)
+        ]
+        
+        for (browser, isEnabled) in chromiumBrowsers {
+            if isEnabled {
+                let tabs = getPlayingTabsFromChromium(browser: browser)
+                for tab in tabs {
+                    pauseChromiumTab(browser: browser, windowIndex: tab.windowIndex, tabIndex: tab.tabIndex)
+                    pausedBrowserTabs.insert(tab.id)
+                }
+                
+                // Mettre à jour l'état de lecture sur le main thread
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    switch browser {
+                    case .brave: self.isBravePlaying = false
+                    case .chrome: self.isChromePlaying = false
+                    case .edge: self.isEdgePlaying = false
+                    case .opera: self.isOperaPlaying = false
+                    case .arc: self.isArcPlaying = false
+                    case .safari: break
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Reprend la lecture sur les onglets qui étaient en pause
+    private func resumePausedBrowserTabs() {
+        guard !pausedBrowserTabs.isEmpty else { return }
+        
+        for tabId in pausedBrowserTabs {
+            let parts = tabId.components(separatedBy: ":")
+            guard parts.count == 3,
+                  let windowIndex = Int(parts[1]),
+                  let tabIndex = Int(parts[2]) else { continue }
+            
+            let browserStr = parts[0]
+            
+            if browserStr == "safari" && isSafariEnabled {
+                playSafariTab(windowIndex: windowIndex, tabIndex: tabIndex)
+            } else if let browser = Browser.allCases.first(where: { $0.identifier == browserStr }) {
+                if browser.isChromium && isBrowserEnabled(browser) {
+                    playChromiumTab(browser: browser, windowIndex: windowIndex, tabIndex: tabIndex)
+                }
+            }
+        }
+        
+        pausedBrowserTabs.removeAll()
+    }
+    
+    /// Vérifie si un navigateur est activé
+    private func isBrowserEnabled(_ browser: Browser) -> Bool {
+        switch browser {
+        case .safari: return isSafariEnabled
+        case .brave: return isBraveEnabled
+        case .chrome: return isChromeEnabled
+        case .edge: return isEdgeEnabled
+        case .opera: return isOperaEnabled
+        case .arc: return isArcEnabled
+        }
+    }
+    
+    /// Vérifie si des médias jouent dans un navigateur (pour l'affichage UI)
+    private func checkBrowserHasPlayingMedia(browser: Browser) -> Bool {
+        if browser == .safari {
+            return !getPlayingTabsFromSafari().isEmpty
         } else {
-            // Safari
-            let script = """
-            tell application "Safari"
-                try
-                    set windowList to every window
-                    repeat with w in windowList
-                        set tabList to every tab of w
-                        repeat with t in tabList
-                            try
-                                do JavaScript "(function() { var dominated = \(enabledDomainsJS); var host = window.location.hostname.replace('www.', ''); var isAllowed = dominated.some(function(d) { return host.indexOf(d) !== -1; }); if (!isAllowed) return; document.querySelectorAll('video, audio').forEach(function(e) { e.\(jsAction); }); })()" in t
-                            end try
-                        end repeat
-                    end repeat
-                end try
-            end tell
-            """
-            _ = runAppleScript(script)
+            return !getPlayingTabsFromChromium(browser: browser).isEmpty
         }
     }
 }

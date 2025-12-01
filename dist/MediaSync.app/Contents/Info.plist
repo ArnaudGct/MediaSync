@@ -13,9 +13,9 @@
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleVersion</key>
-    <string>2.1.0</string>
+    <string>1.0.0</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1</string>
+    <string>1.0</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
@@ -41,6 +41,6 @@
     <key>NSHumanReadableCopyright</key>
     <string>© 2025 Arnaud Graciet. Vibe-codée avec ❤️</string>
     <key>CFBundleGetInfoString</key>
-    <string>MediaSync 2.1.0 - Vibe-codée avec ❤️ par Arnaud Graciet - https://arnaudgct.fr/</string>
+    <string>MediaSync 1.0.0 - Vibe-codée avec ❤️ par Arnaud Graciet - https://arnaudgct.fr/</string>
 </dict>
 </plist>

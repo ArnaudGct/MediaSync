@@ -13,8 +13,8 @@ BUILD_DIR="$(pwd)/.build/release"
 APP_BUNDLE="$(pwd)/dist/${APP_NAME}.app"
 
 # ⚠️ VERSION - Modifiez ces valeurs lors d'une mise à jour
-VERSION="2.1.0"
-VERSION_SHORT="2.1"
+VERSION="1.0.0"
+VERSION_SHORT="1.0"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════════"
@@ -76,45 +76,47 @@ try:
     
     sizes = [16, 32, 64, 128, 256, 512, 1024]
     
-    for size in sizes:
-        # Créer une image avec un fond dégradé
+    def create_icon(size):
+        # Créer une image avec transparence
         img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         
-        # Fond dégradé circulaire
         center = size // 2
-        radius = size // 2 - max(2, size // 32)
+        radius = size // 2
         
-        # Dessiner un cercle avec dégradé
-        for r in range(radius, 0, -1):
-            ratio = r / radius
-            # Dégradé du vert au bleu-vert
-            green = int(49 + (209 - 49) * (1 - ratio))
-            blue = int(89 + (89 - 30) * ratio)
-            color = (30, green, blue, 255)
-            draw.ellipse([center-r, center-r, center+r, center+r], fill=color)
+        # === CERCLE VERT FLAT ===
+        # Couleur verte accent MediaSync: rgb(49, 209, 89)
+        draw.ellipse([0, 0, size - 1, size - 1], fill=(49, 209, 89, 255))
         
-        # Barres de waveform au centre
-        wave_size = size // 3
-        bar_width = max(2, size // 20)
-        bar_gap = max(2, size // 16)
+        # === WAVEFORM BLANC ===
+        wave_height = int(radius * 0.7)
+        bar_width = max(3, int(size / 16))
+        bar_gap = max(2, int(size / 20))
         num_bars = 5
         total_width = num_bars * bar_width + (num_bars - 1) * bar_gap
         start_x = center - total_width // 2
         
-        heights = [0.4, 0.7, 1.0, 0.7, 0.4]
+        # Hauteurs des barres (pattern waveform symétrique)
+        heights = [0.35, 0.65, 1.0, 0.65, 0.35]
+        
         for i, h in enumerate(heights):
-            bar_height = int(wave_size * h)
+            bar_height = int(wave_height * h)
             x = start_x + i * (bar_width + bar_gap)
             y = center - bar_height // 2
-            # Coins arrondis
+            
+            # Barre blanche avec coins arrondis
+            corner_radius = bar_width // 2
             draw.rounded_rectangle(
                 [x, y, x + bar_width, y + bar_height],
-                radius=bar_width // 2,
+                radius=corner_radius,
                 fill=(255, 255, 255, 255)
             )
         
-        # Sauvegarder les différentes tailles
+        return img
+    
+    for size in sizes:
+        img = create_icon(size)
+        
         if size == 16:
             img.save(f"{iconset_dir}/icon_16x16.png")
         elif size == 32:
@@ -133,7 +135,7 @@ try:
         elif size == 1024:
             img.save(f"{iconset_dir}/icon_512x512@2x.png")
     
-    print("✓ Icônes générées avec PIL")
+    print("✓ Icônes générées (flat design)")
 except Exception as e:
     print(f"Erreur: {e}")
 PYTHON_SCRIPT

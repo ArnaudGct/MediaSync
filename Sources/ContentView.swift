@@ -30,7 +30,7 @@ extension Color {
 
 // MARK: - Main Content View
 struct ContentView: View {
-    @EnvironmentObject var monitor: MdiaSyncMonitor
+    @EnvironmentObject var monitor: MediaSyncMonitor
     @EnvironmentObject var updateChecker: UpdateChecker
     @AppStorage("resumeDelay") private var resumeDelay: Double = 1.0
     @AppStorage("autoStart") private var autoStart: Bool = true
@@ -382,10 +382,10 @@ struct ContentView: View {
                     // Section Domaines gérés
                     if monitor.isBraveEnabled || monitor.isChromeEnabled || monitor.isEdgeEnabled || monitor.isOperaEnabled || monitor.isArcEnabled || monitor.isSafariEnabled {
                         BrowserDomainsSection(
-                            browserTabs: monitor.browserTabs,
+                            playingTabs: monitor.playingTabs,
                             enabledDomains: monitor.enabledDomains,
                             onToggleDomain: { domain in monitor.toggleDomain(domain) },
-                            onRefresh: { monitor.refreshBrowserTabs() }
+                            onRefresh: { monitor.refreshPlayingTabs() }
                         )
                     }
                 }
@@ -989,7 +989,7 @@ struct BrowserAppRow: View {
 
 // MARK: - Browser Domains Section
 struct BrowserDomainsSection: View {
-    let browserTabs: [BrowserTab]
+    let playingTabs: [BrowserTab]
     let enabledDomains: Set<String>
     let onToggleDomain: (String) -> Void
     let onRefresh: () -> Void
@@ -1004,11 +1004,15 @@ struct BrowserDomainsSection: View {
         "soundcloud.com": "SoundCloud",
         "deezer.com": "Deezer",
         "music.apple.com": "Apple Music Web",
+        "artlist.io": "Artlist",
         "bandcamp.com": "Bandcamp",
         "tidal.com": "Tidal",
         "vimeo.com": "Vimeo",
         "twitch.tv": "Twitch",
-        "dailymotion.com": "Dailymotion"
+        "dailymotion.com": "Dailymotion",
+        "netflix.com": "Netflix",
+        "primevideo.com": "Prime Video",
+        "disneyplus.com": "Disney+"
     ]
     
     // Combine les domaines connus + ceux détectés dans les onglets
@@ -1017,15 +1021,16 @@ struct BrowserDomainsSection: View {
         
         // Ajouter les domaines connus
         for (domain, name) in knownDomains.sorted(by: { $0.value < $1.value }) {
-            let isPlaying = browserTabs.contains { $0.domain == domain && $0.isPlaying }
+            let isPlaying = playingTabs.contains { $0.domain.contains(domain) || domain.contains($0.domain) }
             result.append((domain, name, isPlaying))
         }
         
         // Ajouter les domaines détectés non connus
-        for tab in browserTabs {
-            if !knownDomains.keys.contains(tab.domain) {
-                if !result.contains(where: { $0.0 == tab.domain }) {
-                    result.append((tab.domain, tab.domain, tab.isPlaying))
+        for tab in playingTabs {
+            let tabDomain = tab.domain
+            if !knownDomains.keys.contains(where: { tabDomain.contains($0) || $0.contains(tabDomain) }) {
+                if !result.contains(where: { $0.0 == tabDomain }) {
+                    result.append((tabDomain, tabDomain, true))
                 }
             }
         }

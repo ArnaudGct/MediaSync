@@ -109,7 +109,7 @@ cp -r "dist/MediaSync.app" /Applications/
 Ou en une seule commande :
 
 ```bash
-./build.sh && rm -rf /Applications/MediaSync.app && cp -r "dist/MediaSync.app" /Applications/ && open /Applications/MediaSync.app
+./build.sh && rm -rf /Applications/MediaSync.app && cp -r "dist/MediaSync.app" /Applications/
 ```
 
 ---

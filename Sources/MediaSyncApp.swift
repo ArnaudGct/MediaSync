@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct MediaSyncApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var monitor = MdiaSyncMonitor()
+    @StateObject private var monitor = MediaSyncMonitor()
     @StateObject private var updateChecker = UpdateChecker()
     
     var body: some Scene {
