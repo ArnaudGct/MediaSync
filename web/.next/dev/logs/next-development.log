@@ -1,0 +1,56 @@
+[01:00:38.232] Server  ERROR    ⨯ Error: Cannot find module 'next/dist/client/components/builtin/global-not-found'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.247] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.259] Server  ERROR    ⨯ Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.273] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.297] Server  ERROR    ⨯ Error: Cannot find module 'next/dist/client/components/builtin/global-not-found'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.307] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.318] Server  ERROR    ⨯ Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js
+[01:00:38.330] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/router-server.js
+- /Users/arnaudgct/Desktop/MediaSync/web/node_modules/next/dist/server/lib/start-server.js

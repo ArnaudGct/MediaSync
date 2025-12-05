@@ -39,7 +39,7 @@ pip3 install Pillow
 
 ### Option 1 : Télécharger la Release
 
-1. Allez sur [Releases](https://github.com/ArnaudGct/MediaSync/releases)
+1. Allez sur [Releases](https://github.com/MediaSyncApp/MediaSync/releases)
 2. Téléchargez le dernier fichier `.dmg`
 3. Ouvrez le DMG et glissez **MediaSync** dans **Applications**
 4. Premier lancement : **Clic droit → Ouvrir → Confirmer** (nécessaire car l'app n'est pas signée Apple)
@@ -48,7 +48,7 @@ pip3 install Pillow
 
 ```bash
 # Cloner le repository
-git clone https://github.com/ArnaudGct/MediaSync.git
+git clone https://github.com/MediaSyncApp/MediaSync.git
 cd MediaSync
 
 # Compiler et créer le .app + .dmg
@@ -146,7 +146,7 @@ git push origin main --tags
 
 ### Publier la Release sur GitHub
 
-1. Allez sur **https://github.com/ArnaudGct/MediaSync/releases**
+1. Allez sur **https://github.com/MediaSyncApp/MediaSync/releases**
 2. Cliquez **"Draft a new release"**
 3. Sélectionnez le tag (ex: `v2.2.0`)
 4. Titre : `MediaSync v2.2.0`
