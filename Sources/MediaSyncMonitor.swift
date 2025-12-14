@@ -41,6 +41,7 @@ class MediaSyncMonitor: ObservableObject {
     @Published var isRunning = false
     @Published var isPremiereActive = false
     @Published var isResolveActive = false
+    @Published var isFinalCutActive = false
     @Published var isAfterEffectsActive = false
     @Published var isSpotifyPlaying = false
     @Published var isAppleMusicPlaying = false
@@ -62,6 +63,9 @@ class MediaSyncMonitor: ObservableObject {
     }
     @Published var isResolveEnabled: Bool {
         didSet { UserDefaults.standard.set(isResolveEnabled, forKey: "isResolveEnabled") }
+    }
+    @Published var isFinalCutEnabled: Bool {
+        didSet { UserDefaults.standard.set(isFinalCutEnabled, forKey: "isFinalCutEnabled") }
     }
     @Published var isAfterEffectsEnabled: Bool {
         didSet { UserDefaults.standard.set(isAfterEffectsEnabled, forKey: "isAfterEffectsEnabled") }
@@ -107,6 +111,9 @@ class MediaSyncMonitor: ObservableObject {
     @Published var resolveDetectionMode: DetectionMode {
         didSet { UserDefaults.standard.set(resolveDetectionMode.rawValue, forKey: "resolveDetectionMode") }
     }
+    @Published var finalCutDetectionMode: DetectionMode {
+        didSet { UserDefaults.standard.set(finalCutDetectionMode.rawValue, forKey: "finalCutDetectionMode") }
+    }
     
     var resumeDelay: Double = 1.0
     
@@ -117,6 +124,7 @@ class MediaSyncMonitor: ObservableObject {
     private var afterEffectsAudioManager: AudioCaptureManager?
     private var premiereAudioManager: AudioCaptureManager?
     private var resolveAudioManager: AudioCaptureManager?
+    private var finalCutAudioManager: AudioCaptureManager?
     
     private var audioCaptureObservers: [AnyCancellable] = []
     
@@ -136,6 +144,7 @@ class MediaSyncMonitor: ObservableObject {
         // Charger les préférences sauvegardées
         isPremiereEnabled = UserDefaults.standard.object(forKey: "isPremiereEnabled") as? Bool ?? true
         isResolveEnabled = UserDefaults.standard.object(forKey: "isResolveEnabled") as? Bool ?? true
+        isFinalCutEnabled = UserDefaults.standard.object(forKey: "isFinalCutEnabled") as? Bool ?? true
         isAfterEffectsEnabled = UserDefaults.standard.object(forKey: "isAfterEffectsEnabled") as? Bool ?? true
         isSpotifyEnabled = UserDefaults.standard.object(forKey: "isSpotifyEnabled") as? Bool ?? true
         isAppleMusicEnabled = UserDefaults.standard.object(forKey: "isAppleMusicEnabled") as? Bool ?? true
@@ -175,6 +184,9 @@ class MediaSyncMonitor: ObservableObject {
         let resolveMode = UserDefaults.standard.string(forKey: "resolveDetectionMode") ?? "pmset"
         resolveDetectionMode = DetectionMode(rawValue: resolveMode) ?? .pmset
         
+        let finalCutMode = UserDefaults.standard.string(forKey: "finalCutDetectionMode") ?? "pmset"
+        finalCutDetectionMode = DetectionMode(rawValue: finalCutMode) ?? .pmset
+        
         // Charger l'état de permission JS navigateur sauvegardé
         hasBrowserJSPermission = UserDefaults.standard.bool(forKey: "hasBrowserJSPermission")
         
@@ -194,6 +206,9 @@ class MediaSyncMonitor: ObservableObject {
             
             // DaVinci Resolve Audio Manager
             resolveAudioManager = AudioCaptureManager(appIdentifier: "com.blackmagic-design.DaVinciResolve", appName: "DaVinci Resolve")
+            
+            // Final Cut Pro Audio Manager
+            finalCutAudioManager = AudioCaptureManager(appIdentifier: "com.apple.FinalCut", appName: "Final Cut Pro")
             
             // Observer After Effects
             if let manager = afterEffectsAudioManager {
@@ -236,6 +251,19 @@ class MediaSyncMonitor: ObservableObject {
                     }
                     .store(in: &audioCaptureObservers)
             }
+            
+            // Observer Final Cut Pro (pour mode audio)
+            if let manager = finalCutAudioManager {
+                manager.$isAppPlaying
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] isPlaying in
+                        guard let self = self else { return }
+                        if self.isFinalCutEnabled && self.finalCutDetectionMode == .audio {
+                            self.isFinalCutActive = isPlaying
+                        }
+                    }
+                    .store(in: &audioCaptureObservers)
+            }
         }
     }
     
@@ -272,6 +300,10 @@ class MediaSyncMonitor: ObservableObject {
             if isResolveEnabled && resolveDetectionMode == .audio {
                 resolveAudioManager?.startMonitoring()
             }
+            // Démarrer la capture audio pour Final Cut Pro si en mode audio
+            if isFinalCutEnabled && finalCutDetectionMode == .audio {
+                finalCutAudioManager?.startMonitoring()
+            }
         }
         
         // Timer plus rapide pour une meilleure réactivité
@@ -291,11 +323,13 @@ class MediaSyncMonitor: ObservableObject {
             afterEffectsAudioManager?.stopMonitoring()
             premiereAudioManager?.stopMonitoring()
             resolveAudioManager?.stopMonitoring()
+            finalCutAudioManager?.stopMonitoring()
         }
         
         DispatchQueue.main.async {
             self.isPremiereActive = false
             self.isResolveActive = false
+            self.isFinalCutActive = false
             self.isAfterEffectsActive = false
             self.isSpotifyPlaying = false
             self.isAppleMusicPlaying = false
@@ -316,6 +350,22 @@ class MediaSyncMonitor: ObservableObject {
         isResolveEnabled.toggle()
         if !isResolveEnabled {
             isResolveActive = false
+        }
+    }
+    
+    func toggleFinalCut() {
+        isFinalCutEnabled.toggle()
+        if !isFinalCutEnabled {
+            isFinalCutActive = false
+            if #available(macOS 13.0, *) {
+                finalCutAudioManager?.stopMonitoring()
+            }
+        } else if isRunning {
+            if #available(macOS 13.0, *) {
+                if finalCutDetectionMode == .audio {
+                    finalCutAudioManager?.startMonitoring()
+                }
+            }
         }
     }
     
@@ -521,6 +571,19 @@ class MediaSyncMonitor: ObservableObject {
         }
     }
     
+    func setFinalCutDetectionMode(_ mode: DetectionMode) {
+        finalCutDetectionMode = mode
+        if isRunning {
+            if #available(macOS 13.0, *) {
+                if mode == .audio {
+                    finalCutAudioManager?.startMonitoring()
+                } else {
+                    finalCutAudioManager?.stopMonitoring()
+                }
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func triggerCheck() {
@@ -534,6 +597,7 @@ class MediaSyncMonitor: ObservableObject {
             
             var premiereActive = false
             var resolveActive = false
+            var finalCutActive = false
             var spotifyPlaying = false
             var appleMusicPlaying = false
             
@@ -562,6 +626,17 @@ class MediaSyncMonitor: ObservableObject {
                 }
             } else if self.isResolveEnabled && self.resolveDetectionMode == .audio {
                 resolveActive = self.isResolveActive
+            }
+            
+            // Check Final Cut Pro (selon le mode de détection)
+            if self.isFinalCutEnabled && self.finalCutDetectionMode == .pmset {
+                group.enter()
+                DispatchQueue.global(qos: .userInteractive).async {
+                    finalCutActive = self.checkPmsetAssertion(for: "Final Cut Pro")
+                    group.leave()
+                }
+            } else if self.isFinalCutEnabled && self.finalCutDetectionMode == .audio {
+                finalCutActive = self.isFinalCutActive
             }
             
             // Check music players
@@ -612,12 +687,14 @@ class MediaSyncMonitor: ObservableObject {
             browserGroup.wait()
             
             // Déterminer quelle app de montage est active
-            let editingAppActive = premiereActive || resolveActive || afterEffectsActive
+            let editingAppActive = premiereActive || resolveActive || finalCutActive || afterEffectsActive
             let currentActiveApp: String
             if premiereActive {
                 currentActiveApp = "Premiere"
             } else if resolveActive {
                 currentActiveApp = "Resolve"
+            } else if finalCutActive {
+                currentActiveApp = "Final Cut Pro"
             } else if afterEffectsActive {
                 currentActiveApp = "After Effects"
             } else {
@@ -636,6 +713,12 @@ class MediaSyncMonitor: ObservableObject {
                     self.isResolveActive = resolveActive
                 } else if !self.isResolveEnabled {
                     self.isResolveActive = false
+                }
+                
+                if self.isFinalCutEnabled && self.finalCutDetectionMode == .pmset {
+                    self.isFinalCutActive = finalCutActive
+                } else if !self.isFinalCutEnabled {
+                    self.isFinalCutActive = false
                 }
                 
                 self.isSpotifyPlaying = self.isSpotifyEnabled ? spotifyPlaying : false

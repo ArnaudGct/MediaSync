@@ -10,7 +10,7 @@ Application macOS native pour synchroniser automatiquement Spotify et Apple Musi
 
 ## ✨ Fonctionnalités
 
-- 🎬 **Détection multi-applications** : Premiere Pro, DaVinci Resolve, After Effects
+- 🎬 **Détection multi-applications** : Premiere Pro, DaVinci Resolve, Final Cut Pro, After Effects
 - 🎵 **Contrôle automatique** : Spotify & Apple Music se mettent en pause pendant la lecture vidéo
 - 🌐 **Support navigateurs** : Safari, Chrome, Brave, Edge, Opera, Arc (YouTube, etc.)
 - 🎧 **Capture audio** : Détection en temps réel via ScreenCaptureKit

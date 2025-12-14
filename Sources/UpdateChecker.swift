@@ -47,7 +47,7 @@ class UpdateChecker: ObservableObject {
     // ⚠️ CONFIGURATION - Repository GitHub
     static let githubOwner = "ArnaudGct"
     static let githubRepo = "MediaSync"
-    static let currentVersion = "1.0.0"  // Version actuelle de l'app
+    static let currentVersion = "1.1.0"  // Version actuelle de l'app
     
     // URL directe pour les releases
     static var releasesUrl: String {

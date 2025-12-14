@@ -13,8 +13,8 @@ BUILD_DIR="$(pwd)/.build/release"
 APP_BUNDLE="$(pwd)/dist/${APP_NAME}.app"
 
 # ⚠️ VERSION - Modifiez ces valeurs lors d'une mise à jour
-VERSION="1.0.0"
-VERSION_SHORT="1.0"
+VERSION="1.1.0"
+VERSION_SHORT="1.1"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════════"

@@ -188,6 +188,7 @@ struct ContentView: View {
         var count = 0
         if monitor.isPremiereEnabled { count += 1 }
         if monitor.isResolveEnabled { count += 1 }
+        if monitor.isFinalCutEnabled { count += 1 }
         if monitor.isAfterEffectsEnabled { count += 1 }
         return count
     }
@@ -254,6 +255,20 @@ struct ContentView: View {
                     showModeSelector: true,
                     onToggleEnabled: { monitor.toggleResolve() },
                     onModeChange: { mode in monitor.setResolveDetectionMode(mode) },
+                    onOpenPreferences: { monitor.openScreenRecordingPreferences() }
+                )
+                
+                EditingAppRow(
+                    iconFallback: "FC",
+                    name: "Final Cut Pro",
+                    isActive: monitor.isFinalCutActive,
+                    isEnabled: monitor.isFinalCutEnabled,
+                    accentColor: .accentGreen,
+                    detectionMode: monitor.finalCutDetectionMode,
+                    hasPermission: monitor.hasScreenCapturePermission,
+                    showModeSelector: true,
+                    onToggleEnabled: { monitor.toggleFinalCut() },
+                    onModeChange: { mode in monitor.setFinalCutDetectionMode(mode) },
                     onOpenPreferences: { monitor.openScreenRecordingPreferences() }
                 )
                 
